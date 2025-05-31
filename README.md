@@ -7,4 +7,5 @@ location /email-api-service/ {
     # Route all requests to index.php
     try_files $uri $uri/ /email-api-service/index.php?$query_string;
     error_log /opt/homebrew/var/log/nginx/email-api-service-error.log debug;
-}```
+}
+```
