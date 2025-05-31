@@ -20,21 +20,21 @@ header("Access-Control-Allow-Credentials: true");
 // in which case the return value will be an int).
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', $uri);
-if($uri[1] !== 'api') {
+if($uri[1] !== 'email-api-service') {
     header("HTTP/1.1 404 Not Found");
-    echo json_encode(["message" => "Not Found"]);
+    echo json_encode(["message" => "API Not Found"]);
     exit();
 }
 // Check if the second segment of the URI is 'emails'
-if($uri[2] !== 'emails') {
+if($uri[2] !== 'api') {
     header("HTTP/1.1 404 Not Found");
-    echo json_encode(["message" => "Not Found"]);
+    echo json_encode(["message" => "API Not Found in URL"]);
     exit();
 }
 // Check if the third segment of the URI is 'send'
-if($uri[3] !== 'send') {
+if($uri[3] !== 'email') {
     header("HTTP/1.1 404 Not Found");
-    echo json_encode(["message" => "Not Found"]);
+    echo json_encode(["message" => "Email Not Found in URL"]);
     exit();
 }
 // Check if the request method is POST
@@ -44,10 +44,10 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 // Include the Email class
-use Src\Email;
+use Src\Email\Mailer;
 use Src\Database\DBConnector;
 // Create a new instance of the Email class
-$email = new Email(new DBConnector());
+$email = new Mailer(new DBConnector());
 // Get the JSON input from the request body
 $input = file_get_contents("php://input");
 // Decode the JSON input
@@ -61,71 +61,24 @@ if(json_last_error() !== JSON_ERROR_NONE) {
 // Check if the required fields are present in the input
 if(!isset($data['subject']) || !isset($data['body']) || !isset($data['to']) || !isset($data['from'])) {
     header("HTTP/1.1 400 Bad Request");
-    echo json_encode(["message" => "Missing required fields"]);
+    echo json_encode(["message" => "Subject, body, to, and from fields cannot be empty."]);
     exit();
 }
-// Set the properties of the Email object
-$email->subject = $data['subject'];
-$email->body = $data['body'];
-$email->to = $data['to'];
-$email->from = $data['from'];
-// Call the send method to send the email
-if($email->send()) {
-    // If the email was sent successfully, return a success response
+
+// Validate email format
+if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL) || !filter_var($data['from'], FILTER_VALIDATE_EMAIL)) {
+    header("HTTP/1.1 400 Bad Request");
+    echo json_encode(["message" => "Invalid email format for 'to' or 'from' address."]);
+    exit();
+}
+$data['status'] = 'pending'; // Default to 'pending' if invalid status
+
+$response = $email->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status']);
+
+if($response){
     header("HTTP/1.1 200 OK");
-    echo json_encode(["message" => "Email sent successfully"]);
-} else {
-    // If there was an error sending the email, return an error response
+    echo json_encode(["message" => "Email queued successfully", "id" => $response]);
+}else{
     header("HTTP/1.1 500 Internal Server Error");
-    echo json_encode(["message" => "Failed to send email"]);
+    echo json_encode(["message" => "Failed to queue email"]);
 }
-
-
-
-/**
- * TO BE DELETED
- */
-
-// $url = 'http://username:password@hostname:9090/path?arg=value#anchor';
-
-// var_dump(parse_url($url));
-// var_dump(parse_url($url, PHP_URL_SCHEME));
-// var_dump(parse_url($url, PHP_URL_USER));
-// var_dump(parse_url($url, PHP_URL_PASS));
-// var_dump(parse_url($url, PHP_URL_HOST));
-// var_dump(parse_url($url, PHP_URL_PORT));
-// var_dump(parse_url($url, PHP_URL_PATH));
-// var_dump(parse_url($url, PHP_URL_QUERY));
-// var_dump(parse_url($url, PHP_URL_FRAGMENT));
-
-/* array(8) {
-  ["scheme"]=>
-  string(4) "http"
-  ["host"]=>
-  string(8) "hostname"
-  ["port"]=>
-  int(9090)
-  ["user"]=>
-  string(8) "username"
-  ["pass"]=>
-  string(8) "password"
-  ["path"]=>
-  string(5) "/path"
-  ["query"]=>
-  string(9) "arg=value"
-  ["fragment"]=>
-  string(6) "anchor"
-}
-string(4) "http"
-string(8) "username"
-string(8) "password"
-string(8) "hostname"
-int(9090)
-string(5) "/path"
-string(9) "arg=value"
-string(6) "anchor"
-*/
-
-/**
- * END OF TO BE DELETED
- */

@@ -31,6 +31,42 @@ class DBConnector{
     public function getLastInsertId() {
         return $this->dbConnection ? $this->dbConnection->lastInsertId() : null;
     }
+    public function insert($data){
+
+        $query = "INSERT INTO emails (subject, body, to_email, from_email, status) VALUES (:subject, :body, :to_email, :from_email, :status)";
+        $stmt = $this->dbConnection->prepare($query);
+        $stmt->bindParam(':subject', $data['subject']);
+        $stmt->bindParam(':body', $data['body']);
+        $stmt->bindParam(':to_email', $data['to']);
+        $stmt->bindParam(':from_email', $data['from']);
+        $stmt->bindParam(':status', $data['status']);
+        if ($stmt->execute()) {
+            return $this->getLastInsertId();
+        } else {
+            return false;
+        }
+    }
+    // public function insert($table, $data) {
+    //     if (!$this->dbConnection) {
+    //         throw new \Exception("Database connection is not established.");
+    //     }
+        
+    //     $columns = implode(", ", array_keys($data));
+    //     $placeholders = ":" . implode(", :", array_keys($data));
+        
+    //     $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+    //     $stmt = $this->dbConnection->prepare($sql);
+        
+    //     foreach ($data as $key => $value) {
+    //         $stmt->bindValue(":{$key}", $value);
+    //     }
+        
+    //     if ($stmt->execute()) {
+    //         return true;
+    //     } else {
+    //         throw new \Exception("Failed to insert data into {$table}.");
+    //     }
+    // }
 }
 
 // class Database {

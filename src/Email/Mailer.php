@@ -1,10 +1,9 @@
 <?php
-namespace Src;
+namespace Src\Email;
 use Src\Database\DBConnector;
 
-class Email{
+class Mailer{
     private $db;
-    private $table = 'emails';
 
     public $subject;
     public $body;
@@ -18,7 +17,36 @@ class Email{
         $this->db = $db;
     }
 
-    public function send(){
-        //Data to be inserted into the database
+    public function send($subject, $body, $to, $from, $status = 'pending'){
+        
+        // Set the properties of the email
+        $this->subject = $subject;
+        $this->body = $body;
+        $this->to = $to;
+        $this->from = $from;
+        $this->status = $status;
+
+        // Prepare the data to be inserted into the database
+        $data = [
+            'subject' => $this->subject,
+            'body' => $this->body,
+            'to' => $this->to,
+            'from' => $this->from,
+            'status' => $this->status
+        ];
+
+        // Check if the database connection is established
+        if (!$this->db->isConnected()) {
+            throw new \Exception("Database connection is not established.");
+        }
+
+        // Insert the email data into the database
+        if (!$this->db->insert($data)) {
+            throw new \Exception("Failed to insert email data into the database.");
+        }
+
+        // Return the last inserted ID
+        return $this->db->getLastInsertId();
+        
     }
 }
