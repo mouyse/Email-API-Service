@@ -74,7 +74,7 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL) || !filter_var($data['from']
 $data['status'] = 'pending'; // Default to 'pending' if invalid status
 
 $response = $email->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status']);
-
+echo "<pre>";print_r($response);echo "</pre>";exit();
 if($response){
     header("HTTP/1.1 200 OK");
     echo json_encode(["message" => "Email queued successfully", "id" => $response]);

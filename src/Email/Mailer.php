@@ -17,7 +17,7 @@ class Mailer{
         $this->db = $db;
     }
 
-    public function send($subject, $body, $to, $from, $status = 'pending'){
+    public function send(string $subject,string $body,string $to,string $from,string $status = 'pending'): ?int{
         
         // Set the properties of the email
         $this->subject = $subject;
@@ -40,13 +40,19 @@ class Mailer{
             throw new \Exception("Database connection is not established.");
         }
 
-        // Insert the email data into the database
-        if (!$this->db->insert($data)) {
-            throw new \Exception("Failed to insert email data into the database.");
-        }
+        try{
 
-        // Return the last inserted ID
-        return $this->db->getLastInsertId();
+            // Insert the email data into the database
+            if (!$this->db->insert($data)) {
+                throw new \Exception("Failed to insert email data into the database.");
+            }
+            
+            // Return the last inserted ID
+            return $this->db->getLastInsertId();
+
+        }catch(\Exception $e){
+            return null;
+        }
         
     }
 }

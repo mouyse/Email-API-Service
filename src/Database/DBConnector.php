@@ -13,26 +13,28 @@ class DBConnector{
             $this->dbConnection = new \PDO("mysql:host={$host};dbname={$dbName}", $username, $password);
             $this->dbConnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            echo "Connection failed: " . $e->getMessage();
+            throw new \Exception("Connection failed: " . $e->getMessage());
         }
     }
-    public function getConnection(){
+    public function getConnection() : ?\PDO {
+        // Return the database connection
         return $this->dbConnection;
     }
-    public function closeConnection(){
+    public function closeConnection() : void {
+        // Close the database connection
         $this->dbConnection = null;
     }
     public function __destruct() {
         $this->closeConnection();
     }
-    public function isConnected() {
+    public function isConnected() : bool {
+        // Check if the database connection is established
         return $this->dbConnection !== null;
     }
-    public function getLastInsertId() {
+    public function getLastInsertId() : ?int {
         return $this->dbConnection ? $this->dbConnection->lastInsertId() : null;
     }
-    public function insert($data){
-
+    public function insert(array $data): bool{
         $query = "INSERT INTO emails (subject, body, to_email, from_email, status) VALUES (:subject, :body, :to_email, :from_email, :status)";
         $stmt = $this->dbConnection->prepare($query);
         $stmt->bindParam(':subject', $data['subject']);
@@ -41,7 +43,7 @@ class DBConnector{
         $stmt->bindParam(':from_email', $data['from']);
         $stmt->bindParam(':status', $data['status']);
         if ($stmt->execute()) {
-            return $this->getLastInsertId();
+            throw new \Exception("Failed to insert data into {$table}.");
         } else {
             return false;
         }
@@ -68,34 +70,3 @@ class DBConnector{
     //     }
     // }
 }
-
-// class Database {
-//     private $host = 'localhost';
-//     private $db_name = 'your_database_name';
-//     private $username = 'your_username';
-//     private $password = 'your_password';
-//     public $conn;
-
-//     public function getConnection() {
-//         $this->conn = null;
-//         try {
-//             $this->conn = new PDO("mysql:host={$this->host};dbname={$this->db_name}", $this->username, $this->password);
-//             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//         } catch (PDOException $exception) {
-//             echo "Connection error: " . $exception->getMessage();
-//         }
-//         return $this->conn;
-//     }
-// }
-// Usage example
-// $database = new Database();
-// $db = $database->getConnection();
-// if ($db) {
-//     echo "Connected successfully!";
-// } else {
-//     echo "Connection failed!";
-// }
-// Note: Replace 'your_database_name', 'your_username', and 'your_password' with actual database credentials.
-// Make sure to handle sensitive information like database credentials securely in production environments.
-// You might want to use environment variables or a configuration file to store these credentials securely.
-// Ensure that the PDO extension is enabled in your PHP installation.   
