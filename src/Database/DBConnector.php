@@ -43,9 +43,9 @@ class DBConnector{
         $stmt->bindParam(':from_email', $data['from']);
         $stmt->bindParam(':status', $data['status']);
         if ($stmt->execute()) {
-            throw new \Exception("Failed to insert data into {$table}.");
+            return true;
         } else {
-            return false;
+            throw new \Exception("Failed to insert data into table.");
         }
     }
     // public function insert($table, $data) {
