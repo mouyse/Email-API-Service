@@ -1,6 +1,5 @@
 <?php
 require "bootstrap.php";
-
 // Set the content type to JSON
 header("Content-Type: application/json");
 // Enable CORS for all origins
@@ -46,12 +45,16 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Include the Email class
 use Src\Email\Mailer;
 use Src\Database\DBConnector;
+
+
 // Create a new instance of the Email class
-$email = new Mailer(new DBConnector());
+$email = new Mailer(new DBConnector(), $mailers);
 // Get the JSON input from the request body
 $input = file_get_contents("php://input");
 // Decode the JSON input
 $data = json_decode($input, true);
+
+
 // Check if the input is valid JSON
 if(json_last_error() !== JSON_ERROR_NONE) {
     header("HTTP/1.1 400 Bad Request");
@@ -76,7 +79,7 @@ $data['status'] = 'pending'; // Default to 'pending' if invalid status
 $response = $email->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status']);
 if($response){
     header("HTTP/1.1 200 OK");
-    echo json_encode(["message" => "Email queued successfully", "id" => $response]);
+    echo json_encode(["message" => "Email queued successfully"]);
 }else{
     header("HTTP/1.1 500 Internal Server Error");
     echo json_encode(["message" => "Failed to queue email"]);
