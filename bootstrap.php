@@ -6,7 +6,7 @@ set_exception_handler(function ($exception){
     http_response_code(500);
     header("HTTP/1.1 500 Internval Server Error");
     header("Content-Type: application/json");
-    echo json_encode(["message" => "Invalid email format for 'to' or 'from' address.".$exception->getMessage()]);
+    echo json_encode(["message" => "Something went wrong.".$exception->getMessage()]);
     exit();
 });
 use Src\Database\DBConnector;

@@ -37,34 +37,22 @@ class Mailer implements MailerInterface{
             'status' => $this->status
         ];
 
-        
         foreach($this->mailers as $mailer){
 
             if($mailer->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status'])){
-                // If the email is sent successfully, we can proceed to save it in the database
-                // or return true if we don't need to save it.
-                return true;
-
-
+                
                 // Check if the database connection is established
                 if (!$this->db->isConnected()) {
                     throw new \Exception("Database connection is not established.");
                 }
-
-                try{
-
-                    // Insert the email data into the database
-                    if (!$this->db->insert($data)) {
-                        throw new \Exception("Failed to insert email data into the database.");
-                    }
-                    
-                    // Return the last inserted ID
-                    // return $this->db->getLastInsertId();
-                    return true;
-
-                }catch(\Exception $e){
-                    return null;
+                // Insert the email data into the database
+                if (!$this->db->insert($data)) {
+                    throw new \Exception("Failed to insert email data into the database.");
                 }
+                
+                // Return the last inserted ID
+                // return $this->db->getLastInsertId();
+                return true;
 
             }
 
