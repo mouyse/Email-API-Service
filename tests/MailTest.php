@@ -42,16 +42,64 @@ class MailTest extends TestCase
         );
     }
 
-    // Test invalid email
-    public function testInvalidEmailFormat()
+    // Test invalid 'from' email
+    public function testInvalidFromEmailFormat()
     {
-        $this->assertTrue(
-            $this->mailer->send(
-                'Test Subject',
-                'This is a test email body.',
-                'jayy.shah16@gmail.com',
-                'invalid-email-format' // Invalid email format
-            )
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'from' email address.");
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->mailer->send(
+            'Test Subject',
+            'This is a test email body.',
+            'jayy.shah16@gmail.com',
+            'invalid-email-format' // Invalid email format
+        );
+    }
+
+
+    // Test invalid 'to' email
+    public function testInvalidToEmailFormat()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid 'to' email address.");
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->mailer->send(
+            'Test Subject',
+            'This is a test email body.',
+            'invalid-email-format', // Invalid email format
+            'jayy.shah16@gmail.com',
+        );
+    }
+
+    // Test empty subject email
+    public function testValidSubject()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Subject cannot be empty and must not exceed 255 characters.");
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->mailer->send(
+            '',
+            'This is a test email body.',
+            'jayy.shah16@gmail.com',
+            'jayy.shah16@gmail.com',
+        );
+    }
+
+    // Test empty body email
+    public function testValidBody()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Body cannot be empty.");
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->mailer->send(
+            'This is a test subject.',
+            '',
+            'jayy.shah16@gmail.com',
+            'jayy.shah16@gmail.com',
         );
     }
 }

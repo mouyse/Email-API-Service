@@ -1,6 +1,7 @@
 <?php
 namespace Src\Email;
 use Src\Database\DBConnector;
+use Src\Validators\MailFormValidator;
 
 class Mailer implements MailerInterface{
     private $db;
@@ -36,6 +37,8 @@ class Mailer implements MailerInterface{
             'from' => $this->from,
             'status' => $this->status
         ];
+
+        MailFormValidator::validate($data);
 
         foreach($this->mailers as $mailer){
 
