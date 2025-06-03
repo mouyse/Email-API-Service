@@ -1,13 +1,13 @@
 <?php
 namespace Src\Tests;
 use PHPUnit\Framework\TestCase;
-use Src\Email\Mailer;
+use Src\Queues\MailQueue;
 use Src\Email\SendGridMailer;
 use Src\Email\MailgunMailer;
 
 class MailTest extends TestCase
 {
-    private $mailer;
+    private $mail_queue;
 
     protected function setUp(): void
     {
@@ -24,8 +24,7 @@ class MailTest extends TestCase
         if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') $mailers[] = new MailgunMailer($_ENV['ESP2_API_KEY'], $_ENV['ESP2_DOMAIN']);
         
         // Inject the mocks into the Mailer class
-        $this->mailer = new Mailer($dbMock, $mailers);
-
+        $this->mail_queue = new MailQueue($dbMock);
     }
 
 
@@ -33,7 +32,7 @@ class MailTest extends TestCase
     public function testValidEmailFormat()
     {
         $this->assertTrue(
-            $this->mailer->send(
+            $this->mail_queue->addEmailToQueue(
                 'Test Subject',
                 'This is a test email body.',
                 'jayy.shah16@gmail.com',
@@ -49,7 +48,7 @@ class MailTest extends TestCase
         $this->expectExceptionMessage("Invalid 'from' email address.");
         // Attempt to send an email with an invalid email format
         // This will throw an exception due to the invalid email format
-        $this->mailer->send(
+        $this->mail_queue->addEmailToQueue(
             'Test Subject',
             'This is a test email body.',
             'jayy.shah16@gmail.com',
@@ -65,7 +64,7 @@ class MailTest extends TestCase
         $this->expectExceptionMessage("Invalid 'to' email address.");
         // Attempt to send an email with an invalid email format
         // This will throw an exception due to the invalid email format
-        $this->mailer->send(
+        $this->mail_queue->addEmailToQueue(
             'Test Subject',
             'This is a test email body.',
             'invalid-email-format', // Invalid email format
@@ -80,7 +79,7 @@ class MailTest extends TestCase
         $this->expectExceptionMessage("Subject cannot be empty and must not exceed 255 characters.");
         // Attempt to send an email with an invalid email format
         // This will throw an exception due to the invalid email format
-        $this->mailer->send(
+        $this->mail_queue->addEmailToQueue(
             '',
             'This is a test email body.',
             'jayy.shah16@gmail.com',
@@ -95,7 +94,7 @@ class MailTest extends TestCase
         $this->expectExceptionMessage("Body cannot be empty.");
         // Attempt to send an email with an invalid email format
         // This will throw an exception due to the invalid email format
-        $this->mailer->send(
+        $this->mail_queue->addEmailToQueue(
             'This is a test subject.',
             '',
             'jayy.shah16@gmail.com',

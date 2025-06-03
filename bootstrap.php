@@ -19,14 +19,14 @@ $dotenv->safeLoad();
 
 $database = (new DBConnector())->getConnection();
 
-$mailers = [];
-if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') $mailers[] = new SendGridMailer($_ENV['ESP1_API_KEY'], $_ENV['ESP1_DOMAIN']);
-if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') $mailers[] = new MailgunMailer($_ENV['ESP2_API_KEY'], $_ENV['ESP2_DOMAIN']);
+// $mailers = [];
+// if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') $mailers[] = new SendGridMailer($_ENV['ESP1_API_KEY'], $_ENV['ESP1_DOMAIN']);
+// if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') $mailers[] = new MailgunMailer($_ENV['ESP2_API_KEY'], $_ENV['ESP2_DOMAIN']);
 
-if(empty($mailers)){
-    http_response_code(500);
-    header("HTTP/1.1 500 Internal Server Error");
-    header("Content-Type: application/json");
-    echo json_encode(["message" => "No email service provider configured."]);
-    exit();
-}
+// if(empty($mailers)){
+//     http_response_code(500);
+//     header("HTTP/1.1 500 Internal Server Error");
+//     header("Content-Type: application/json");
+//     echo json_encode(["message" => "No email service provider configured."]);
+//     exit();
+// }

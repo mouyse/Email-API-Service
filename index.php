@@ -43,12 +43,13 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 // Include the Email class
-use Src\Email\Mailer;
+use Src\Queues\MailQueue;
 use Src\Database\DBConnector;
 
 
 // Create a new instance of the Email class
-$email = new Mailer(new DBConnector(), $mailers);
+$mail_queue = new MailQueue(new DBConnector());
+
 // Get the JSON input from the request body
 $input = file_get_contents("php://input");
 // Decode the JSON input
@@ -76,7 +77,8 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL) || !filter_var($data['from']
 }
 $data['status'] = 'pending'; // Default to 'pending' if invalid status
 
-$response = $email->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status']);
+$response = $mail_queue->addEmailToQueue($data['subject'], $data['body'], $data['to'], $data['from']);
+
 if($response){
     header("HTTP/1.1 200 OK");
     echo json_encode(["message" => "Email queued successfully"]);

@@ -9,3 +9,11 @@ location /email-api-service/ {
     error_log /opt/homebrew/var/log/nginx/email-api-service-error.log debug;
 }
 ```
+
+### Cron setup
+
+
+```# Specific location for email-api-service
+* * * * * php /path/to/MailQueueProcessor.php --worker-id=1 >> log1.log 2>&1
+* * * * * php /path/to/MailQueueProcessor.php --worker-id=2 >> log2.log 2>&1
+```

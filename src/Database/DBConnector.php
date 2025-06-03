@@ -35,7 +35,7 @@ class DBConnector{
         return $this->dbConnection ? $this->dbConnection->lastInsertId() : null;
     }
     public function insert(array $data): bool{
-        $query = "INSERT INTO emails (subject, body, to_email, from_email, status) VALUES (:subject, :body, :to_email, :from_email, :status)";
+        $query = "INSERT INTO mail_queue (subject, body, to_email, from_email, status) VALUES (:subject, :body, :to_email, :from_email, :status)";
         $stmt = $this->dbConnection->prepare($query);
         $stmt->bindParam(':subject', $data['subject']);
         $stmt->bindParam(':body', $data['body']);
