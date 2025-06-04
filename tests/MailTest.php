@@ -36,7 +36,8 @@ class MailTest extends TestCase
                 'Test Subject',
                 'This is a test email body.',
                 'jayy.shah16@gmail.com',
-                'jayy.shah16@gmail.com'
+                'jayy.shah16@gmail.com',
+                []
             )
         );
     }
@@ -52,7 +53,8 @@ class MailTest extends TestCase
             'Test Subject',
             'This is a test email body.',
             'jayy.shah16@gmail.com',
-            'invalid-email-format' // Invalid email format
+            'invalid-email-format', // Invalid email format
+            []
         );
     }
 
@@ -69,11 +71,12 @@ class MailTest extends TestCase
             'This is a test email body.',
             'invalid-email-format', // Invalid email format
             'jayy.shah16@gmail.com',
+            []
         );
     }
 
     // Test empty subject email
-    public function testValidSubject()
+    public function testInvalidSubject()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Subject cannot be empty and must not exceed 255 characters.");
@@ -84,11 +87,12 @@ class MailTest extends TestCase
             'This is a test email body.',
             'jayy.shah16@gmail.com',
             'jayy.shah16@gmail.com',
+            []
         );
     }
 
     // Test empty body email
-    public function testValidBody()
+    public function testEmptyBody()
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("Body cannot be empty.");
@@ -99,6 +103,43 @@ class MailTest extends TestCase
             '',
             'jayy.shah16@gmail.com',
             'jayy.shah16@gmail.com',
+            []
+        );
+    }
+
+    // Test empty body email
+    public function testValidBodyWithParameters()
+    {
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->assertTrue(
+            $this->mail_queue->addEmailToQueue(
+                'Test Subject with Parameters',
+                'Hi, {{first_name}} {{last_name}}, How are you doing today?',
+                'jayy.shah16@gmail.com',
+                'jayy.shah16@gmail.com',
+                [
+                    'first_name' => 'Jayy',
+                    'last_name' => 'Shah'
+                ]
+            )
+        );
+    }
+
+    // Test empty body email
+    public function testValidBodyWithNoParameters()
+    {
+        // Attempt to send an email with an invalid email format
+        // This will throw an exception due to the invalid email format
+        $this->assertTrue(
+            $this->mail_queue->addEmailToQueue(
+                'Test Subject with Parameters',
+                'Hi, {{first_name}} {{last_name}}, How are you doing today?',
+                'jayy.shah16@gmail.com',
+                'jayy.shah16@gmail.com',
+                [
+                ]
+            )
         );
     }
 }

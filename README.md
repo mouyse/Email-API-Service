@@ -12,8 +12,46 @@ location /email-api-service/ {
 
 ### Cron setup
 
-
-```# Specific location for email-api-service
+```
 * * * * * php /path/to/MailQueueProcessor.php --worker-id=1 >> log1.log 2>&1
 * * * * * php /path/to/MailQueueProcessor.php --worker-id=2 >> log2.log 2>&1
+```
+
+### cURL Snippet
+
+#### With Parameters:
+
+```
+curl --location 'localhost/email-api-service/api/email' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "subject": "Test subject",
+    "to": "jayy.shah16@gmail.com",
+    "from": "jayy.shah16@gmail.com",
+    "body": "Hi, {{first_name}} {{last_name}}, How are you doing today?",
+    "parameters": {
+        "first_name": "Jay",
+        "last_name": "Shah"
+    }
+}'
+```
+
+#### Without Parameters:
+
+```
+curl --location 'localhost/email-api-service/api/email' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "subject": "Test subject",
+    "to": "jayy.shah16@gmail.com",
+    "from": "jayy.shah16@gmail.com",
+    "body": "Hi Test, How are you doing today?"
+}'
+```
+
+### Run PHP Unit Tests
+
+
+```
+./vendor/bin/phpunit tests                        
 ```
