@@ -11,6 +11,7 @@ class MailQueue
     public $body;
     public $to;
     public $from;
+    public $parameters;
 
     public function __construct(DBConnector $db)
     {
@@ -31,14 +32,25 @@ class MailQueue
         $stmt->execute([$status, $id]);
     }
 
-    public function addEmailToQueue(string $subject, string $body, string $to, string $from): bool {
+    public function renderTemplate(string $template, array $parameters): string {
+        foreach($parameters as $key => $value) {
+           $template = str_replace('{{'.$key.'}}',htmlspecialchars($value),$template); // Extract variables from the data array
+        }
+        return $template;
+    }
+
+    public function addEmailToQueue(string $subject, string $body, string $to, string $from, array $parameters): bool {
         
         
         // Set the properties of the email
         $this->subject = $subject;
+        $this->parameters = $parameters;
         $this->body = $body;
         $this->to = $to;
         $this->from = $from;
+
+        $this->body = $this->renderTemplate($this->body, $this->parameters);
+
 
         // Prepare the data to be inserted into the database
         $data = [

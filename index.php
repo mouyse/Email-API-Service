@@ -77,7 +77,7 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL) || !filter_var($data['from']
 }
 $data['status'] = 'pending'; // Default to 'pending' if invalid status
 
-$response = $mail_queue->addEmailToQueue($data['subject'], $data['body'], $data['to'], $data['from']);
+$response = $mail_queue->addEmailToQueue($data['subject'], $data['body'], $data['to'], $data['from'], $data['parameters']??array());
 
 if($response){
     header("HTTP/1.1 200 OK");
