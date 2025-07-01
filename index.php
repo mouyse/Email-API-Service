@@ -48,7 +48,7 @@ use Src\Database\DBConnector;
 
 
 // Create a new instance of the Email class
-$mail_queue = new MailQueue(new DBConnector());
+$mail_queue = new MailQueue(DBConnector::getInstance());
 
 // Get the JSON input from the request body
 $input = file_get_contents("php://input");

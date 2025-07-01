@@ -17,7 +17,7 @@ use Src\Email\MailgunMailer;
 $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->safeLoad();
 
-$database = (new DBConnector())->getConnection();
+$database = DBConnector::getInstance();
 
 // $mailers = [];
 // if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') $mailers[] = new SendGridMailer($_ENV['ESP1_API_KEY'], $_ENV['ESP1_DOMAIN']);

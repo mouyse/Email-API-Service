@@ -16,7 +16,7 @@ class MailTest extends TestCase
         $dotenv->safeLoad();
 
         // Mock the DBConnector and MailerInterface for testing
-        $dbMock = $this->createMock(\Src\Database\DBConnector::class);
+        $dbMock = $this->createMock(\Src\Database\DBConnector::getInstance());
         $dbMock->method('isConnected')->willReturn(true);
         $dbMock->method('insert')->willReturn(true);
         $mailers = [];

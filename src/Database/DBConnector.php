@@ -2,9 +2,10 @@
 namespace Src\Database;
 
 class DBConnector{
+    private static ?DBConnector $instance = null;
     private $dbConnection = null;
 
-    public function __construct(){
+    private function __construct(){
         $host = getenv('DB_HOST') ?: 'localhost';
         $dbName = getenv('DB_NAME') ?: 'your_database_name';
         $username = getenv('DB_USER') ?: 'your_username';
@@ -12,10 +13,18 @@ class DBConnector{
         try {
             $this->dbConnection = new \PDO("mysql:host={$host};dbname={$dbName}", $username, $password);
             $this->dbConnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             throw new \Exception("Connection failed: " . $e->getMessage());
         }
     }
+
+    public static function getInstance(): DBConnector {
+        if (self::$instance === null) {
+            self::$instance = new DBConnector();
+        }
+        return self::$instance;
+    }
+
     public function getConnection() : ?\PDO {
         // Return the database connection
         return $this->dbConnection;
@@ -23,6 +32,7 @@ class DBConnector{
     public function closeConnection() : void {
         // Close the database connection
         $this->dbConnection = null;
+        self::$instance = null;
     }
     public function __destruct() {
         $this->closeConnection();
@@ -48,25 +58,4 @@ class DBConnector{
             throw new \Exception("Failed to insert data into table.");
         }
     }
-    // public function insert($table, $data) {
-    //     if (!$this->dbConnection) {
-    //         throw new \Exception("Database connection is not established.");
-    //     }
-        
-    //     $columns = implode(", ", array_keys($data));
-    //     $placeholders = ":" . implode(", :", array_keys($data));
-        
-    //     $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
-    //     $stmt = $this->dbConnection->prepare($sql);
-        
-    //     foreach ($data as $key => $value) {
-    //         $stmt->bindValue(":{$key}", $value);
-    //     }
-        
-    //     if ($stmt->execute()) {
-    //         return true;
-    //     } else {
-    //         throw new \Exception("Failed to insert data into {$table}.");
-    //     }
-    // }
 }
