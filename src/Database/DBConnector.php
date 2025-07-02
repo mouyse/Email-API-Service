@@ -1,26 +1,21 @@
 <?php
 namespace Src\Database;
+use Src\Config\Config;
+use Src\Database\PdoFactory;
 
 class DBConnector{
     private static ?DBConnector $instance = null;
     private $dbConnection = null;
 
-    private function __construct(){
-        $host = getenv('DB_HOST') ?: 'localhost';
-        $dbName = getenv('DB_NAME') ?: 'your_database_name';
-        $username = getenv('DB_USER') ?: 'your_username';
-        $password = getenv('DB_PASSWORD') ?: 'your_password';
-        try {
-            $this->dbConnection = new \PDO("mysql:host={$host};dbname={$dbName}", $username, $password);
-            $this->dbConnection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch (\PDOException $e) {
-            throw new \Exception("Connection failed: " . $e->getMessage());
-        }
+    private function __construct(\PDO $pdo){
+        $this->dbConnection = $pdo;
     }
 
     public static function getInstance(): DBConnector {
         if (self::$instance === null) {
-            self::$instance = new DBConnector();
+            $config = Config::getInstance()->getDatabaseConfig();
+            $pdo = PdoFactory::create($config);
+            self::$instance = new DBConnector($pdo);
         }
         return self::$instance;
     }
