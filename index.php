@@ -45,10 +45,13 @@ if($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Include the Email class
 use Src\Queues\MailQueue;
 use Src\Database\DBConnector;
+use Src\Repositories\MailQueueRepository;
 
 
 // Create a new instance of the Email class
-$mail_queue = new MailQueue(DBConnector::getInstance());
+$db = DBConnector::getInstance();
+$repository = new MailQueueRepository($db);
+$mailQueue = new MailQueue($repository);
 
 // Get the JSON input from the request body
 $input = file_get_contents("php://input");
@@ -77,7 +80,7 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL) || !filter_var($data['from']
 }
 $data['status'] = 'pending'; // Default to 'pending' if invalid status
 
-$response = $mail_queue->addEmailToQueue($data['subject'], $data['body'], $data['to'], $data['from'], $data['parameters']??array());
+$response = $mailQueue->addEmailToQueue($data['subject'], $data['body'], $data['to'], $data['from'], $data['parameters']??array());
 
 if($response){
     header("HTTP/1.1 200 OK");
