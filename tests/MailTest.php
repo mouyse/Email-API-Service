@@ -4,6 +4,8 @@ use PHPUnit\Framework\TestCase;
 use Src\Queues\MailQueue;
 use Src\Email\SendGridMailer;
 use Src\Email\MailgunMailer;
+use Src\Factories\MailerFactory;
+use Src\Repositories\MailQueueRepository;
 
 class MailTest extends TestCase
 {
@@ -16,15 +18,29 @@ class MailTest extends TestCase
         $dotenv->safeLoad();
 
         // Mock the DBConnector and MailerInterface for testing
-        $dbMock = $this->createMock(\Src\Database\DBConnector::getInstance());
+        $dbMock = $this->createMock(\Src\Database\DBConnector::class);
         $dbMock->method('isConnected')->willReturn(true);
         $dbMock->method('insert')->willReturn(true);
+
+        // Create the repository
+        $repository = new MailQueueRepository($dbMock);
+
         $mailers = [];
-        if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') $mailers[] = new SendGridMailer($_ENV['ESP1_API_KEY'], $_ENV['ESP1_DOMAIN']);
-        if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') $mailers[] = new MailgunMailer($_ENV['ESP2_API_KEY'], $_ENV['ESP2_DOMAIN']);
-        
-        // Inject the mocks into the Mailer class
-        $this->mail_queue = new MailQueue($dbMock);
+        if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') {
+            $mailers[] = MailerFactory::createMailer('sendgrid', [
+                'api_key' => $_ENV['ESP1_API_KEY'],
+                'domain' => $_ENV['ESP1_DOMAIN']
+            ]);
+        }
+        if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') {
+            $mailers[] = MailerFactory::createMailer('mailgun', [
+                'api_key' => $_ENV['ESP2_API_KEY'],
+                'domain' => $_ENV['ESP2_DOMAIN']
+            ]);
+        }
+
+        // Inject the repository into MailQueue
+        $this->mail_queue = new MailQueue($repository);
     }
 
 

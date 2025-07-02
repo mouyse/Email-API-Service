@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Queues/MailQueue.php';
+use Src\Factories\MailerFactory;
 
 // Load environment variables from .env file
 $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
@@ -8,8 +9,18 @@ $dotenv->safeLoad();
 $database = DBConnector::getInstance();
 
 $mailers = [];
-if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') $mailers[] = new SendGridMailer($_ENV['ESP1_API_KEY'], $_ENV['ESP1_DOMAIN']);
-if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') $mailers[] = new MailgunMailer($_ENV['ESP2_API_KEY'], $_ENV['ESP2_DOMAIN']);
+if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') {
+    $mailers[] = MailerFactory::createMailer('sendgrid', [
+        'api_key' => $_ENV['ESP1_API_KEY'],
+        'domain' => $_ENV['ESP1_DOMAIN']
+    ]);
+}
+if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') {
+    $mailers[] = MailerFactory::createMailer('mailgun', [
+        'api_key' => $_ENV['ESP2_API_KEY'],
+        'domain' => $_ENV['ESP2_DOMAIN']
+    ]);
+}
 
 $mail_queue = new MailQueue($mailers);
 $jobs = $queue->fetchPendingJobs($_ENV['BATCH_SIZE'] ?? 100);
