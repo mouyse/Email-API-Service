@@ -164,6 +164,8 @@ location /email-api-service/ {
 }
 ```
 
+---
+
 ## Cron setup
 
 ```
@@ -202,6 +204,8 @@ curl --location 'localhost/email-api-service/api/email' \
     "body": "Hi Test, How are you doing today?"
 }'
 ```
+
+---
 
 ## Run PHP Unit Tests
 ```
