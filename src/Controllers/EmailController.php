@@ -4,6 +4,7 @@ namespace Src\Controllers;
 use Src\Queues\MailQueue;
 use Src\Database\DBConnector;
 use Src\Repositories\MailQueueRepository;
+use Src\Models\Email;
 
 class EmailController
 {
@@ -16,13 +17,15 @@ class EmailController
 
     public function sendEmail(array $data)
     {
-        $response = $this->mailQueue->addEmailToQueue(
+        $email = new Email(
             $data['subject'],
             $data['body'],
             $data['to'],
             $data['from'],
-            $data['parameters'] ?? []
+            $data['parameters'] ?? [],
+            $data['status'] ?? 'pending'
         );
+        $response = $this->mailQueue->addEmailToQueue($email);
 
         if($response){
             $this->respond(200, ["message" => "Email queued successfully"]);

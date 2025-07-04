@@ -1,0 +1,3 @@
+<report>
+        <html outputDirectory="code-coverage-report"/>
+</report>

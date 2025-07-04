@@ -3,6 +3,7 @@ namespace Src\Queues;
 use Src\Database\DBConnector;
 use Src\Validators\MailFormValidator;
 use Src\Repositories\MailQueueRepository;
+use Src\Models\Email;
 
 class MailQueue
 {
@@ -44,27 +45,12 @@ class MailQueue
         return $template;                
     }
 
-    public function addEmailToQueue(string $subject, string $body, string $to, string $from, array $parameters): bool {
-        
-        
-        // Set the properties of the email
-        $this->subject = $subject;
-        $this->parameters = $parameters;
-        $this->body = $body;
-        $this->to = $to;
-        $this->from = $from;
-
-        $this->body = $this->renderTemplate($this->body, $this->parameters);
-
+    public function addEmailToQueue(Email $email): bool {
+        // Render template with parameters
+        $email->body = $this->renderTemplate($email->body, $email->parameters);
 
         // Prepare the data to be inserted into the database
-        $data = [
-            'subject' => $this->subject,
-            'body' => $this->body,
-            'to' => $this->to,
-            'from' => $this->from,
-            'status' => 'pending',
-        ];
+        $data = $email->toArray();
 
         MailFormValidator::validate($data);
 
@@ -74,6 +60,5 @@ class MailQueue
         }
 
         return true;
-        
     }
 }
