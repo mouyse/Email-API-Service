@@ -1,24 +1,50 @@
 <?php
+declare(strict_types=1);
+
 namespace Src\Email;
 use Src\Database\DBConnector;
 
+/**
+ * Class Mailer
+ * Implements MailerInterface and delegates sending to multiple mailer services.
+ */
 class Mailer implements MailerInterface{
-    private $db;
-    private $mailers;
+    /**
+     * @var DBConnector
+     */
+    private DBConnector $db;
+    /**
+     * @var array
+     */
+    private array $mailers;
 
-    public $subject;
-    public $body;
-    public $to;
-    public $from;
-    public $status;
+    public string $subject;
+    public string $body;
+    public string $to;
+    public string $from;
+    public string $status;
 
-    // Applying Dependency Injection for the database connection
-    // This allows for easier testing and flexibility in changing the database connection
+    /**
+     * Mailer constructor.
+     *
+     * @param DBConnector $db
+     * @param array $mailers
+     */
     public function __construct(DBConnector $db, array $mailers){
         $this->db = $db;
         $this->mailers = $mailers;
     }
 
+    /**
+     * Sends an email using the first available mailer service.
+     *
+     * @param string $subject
+     * @param string $body
+     * @param string $to
+     * @param string $from
+     * @param string $status
+     * @return bool
+     */
     public function send(string $subject,string $body,string $to,string $from,string $status): bool{
         
         // Set the properties of the email

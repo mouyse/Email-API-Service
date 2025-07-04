@@ -1,43 +1,71 @@
 <?php
+declare(strict_types=1);
+
 namespace Src\Queues;
 use Src\Database\DBConnector;
 use Src\Validators\MailFormValidator;
 use Src\Repositories\MailQueueRepository;
 use Src\Models\Email;
 
+/**
+ * Class MailQueue
+ * Handles email queue operations such as adding emails to the queue, fetching pending jobs, and updating email status.
+ */
 class MailQueue
 {
+    /**
+     * @var MailQueueRepository
+     */
     private MailQueueRepository $repository;
 
-    public $subject;
-    public $body;
-    public $to;
-    public $from;
-    public $parameters;
+    public string $subject;
+    public string $body;
+    public string $to;
+    public string $from;
+    public array $parameters;
 
+    /**
+     * MailQueue constructor.
+     * @param MailQueueRepository $repository
+     */
     public function __construct(MailQueueRepository $repository)
     {
         $this->repository = $repository;
         // Load environment variables from .env file
-        $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(__DIR__.'/../');
+        $dotenv = \Dotenv\Dotenv::createUnsafeImmutable(__DIR__ . '/../');
         $dotenv->safeLoad();
     }
     
-    public function fetchPendingJobs($limit): array {
-        // $stmt = $this->db->prepare("SELECT * FROM mail_queue WHERE status = 'pending' AND attempts < ? LIMIT ?");
-        // $stmt->execute([$_ENV['MAX_RETRIES'], $limit]);
-        // return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        return $this->repository->fetchPending($limit, $_ENV['MAX_RETRIES']);
-
+    /**
+     * Fetches pending email jobs from the queue.
+     *
+     * @param int $limit
+     * @return array
+     */
+    public function fetchPendingJobs(int $limit): array 
+    {
+        return $this->repository->fetchPending($limit, (int) ($_ENV['MAX_RETRIES'] ?? 3));
     }
 
-    public function updateEmailStatus($id, string $status): void {
-        // $stmt = $this->db->prepare("UPDATE mail_queue SET status = ?, attempts = attempts + 1, sent_at = NOW() WHERE id = ?");
-        // $stmt->execute([$status, $id]);
+    /**
+     * Updates the status of an email in the queue.
+     *
+     * @param int $id
+     * @param string $status
+     * @return void
+     */
+    public function updateEmailStatus(int $id, string $status): void 
+    {
         $this->repository->updateStatus($id, $status);
-
     }
 
+    /**
+     * Renders an email template by replacing placeholders with parameters.
+     *
+     * @param string $template
+     * @param array $parameters
+     * @return string
+     */
     public function renderTemplate(string $template, array $parameters): string {
         foreach($parameters as $key => $value) {
            $template = str_replace('{{'.$key.'}}',htmlspecialchars($value),$template); // Extract variables from the data array
@@ -45,14 +73,22 @@ class MailQueue
         return $template;                
     }
 
-    public function addEmailToQueue(Email $email): bool {
+    /**
+     * Adds an email to the queue.
+     *
+     * @param Email $email
+     * @return bool
+     * @throws \Exception
+     */
+    public function addEmailToQueue(Email $email): bool 
+    {
         // Render template with parameters
         $email->body = $this->renderTemplate($email->body, $email->parameters);
 
         // Prepare the data to be inserted into the database
         $data = $email->toArray();
 
-        MailFormValidator::validate($data);
+        \Src\Validators\MailFormValidator::validate($data);
 
         // Insert the email data into the database
         if (!$this->repository->add($data)) {

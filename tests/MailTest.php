@@ -7,11 +7,23 @@ use Src\Email\MailgunMailer;
 use Src\Factories\MailerFactory;
 use Src\Repositories\MailQueueRepository;
 use Src\Models\Email;
+use Src\Database\DBConnector;
 
+/**
+ * Class MailTest
+ * Contains unit tests for the MailQueue functionality and email validation.
+ */
 class MailTest extends TestCase
 {
+    /**
+     * @var MailQueue
+     */
     private $mail_queue;
 
+    /**
+     * Sets up the test environment and initializes MailQueue with a mocked repository.
+     * @return void
+     */
     protected function setUp(): void
     {
         // Load environment variables from .env file
@@ -44,8 +56,10 @@ class MailTest extends TestCase
         $this->mail_queue = new MailQueue($repository);
     }
 
-
-    // Test valid email
+    /**
+     * Tests that a valid email is successfully added to the queue.
+     * @return void
+     */
     public function testValidEmailFormat()
     {
         $email = new Email(
@@ -60,7 +74,10 @@ class MailTest extends TestCase
         );
     }
 
-    // Test invalid 'from' email
+    /**
+     * Tests that an invalid 'from' email address throws an exception.
+     * @return void
+     */
     public function testInvalidFromEmailFormat()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -75,8 +92,10 @@ class MailTest extends TestCase
         $this->mail_queue->addEmailToQueue($email);
     }
 
-
-    // Test invalid 'to' email
+    /**
+     * Tests that an invalid 'to' email address throws an exception.
+     * @return void
+     */
     public function testInvalidToEmailFormat()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -93,7 +112,10 @@ class MailTest extends TestCase
         $this->mail_queue->addEmailToQueue($email);
     }
 
-    // Test empty subject email
+    /**
+     * Tests that an empty subject throws an exception.
+     * @return void
+     */
     public function testInvalidSubject()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -110,7 +132,10 @@ class MailTest extends TestCase
         $this->mail_queue->addEmailToQueue($email);
     }
 
-    // Test empty body email
+    /**
+     * Tests that an empty body throws an exception.
+     * @return void
+     */
     public function testEmptyBody()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -127,7 +152,10 @@ class MailTest extends TestCase
         $this->mail_queue->addEmailToQueue($email);
     }
 
-    // Test empty body email
+    /**
+     * Tests that a valid email with parameters is successfully added to the queue.
+     * @return void
+     */
     public function testValidBodyWithParameters()
     {
         // Attempt to send an email with an invalid email format
@@ -147,7 +175,10 @@ class MailTest extends TestCase
         );
     }
 
-    // Test empty body email
+    /**
+     * Tests that a valid email with no parameters is successfully added to the queue.
+     * @return void
+     */
     public function testValidBodyWithNoParameters()
     {
         // Attempt to send an email with an invalid email format

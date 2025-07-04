@@ -1,1 +1,1 @@
-{"version":1,"defects":[],"times":[]}
+{"version":1,"defects":[],"times":{"Src\\Tests\\MailTest::testValidEmailFormat":0.007,"Src\\Tests\\MailTest::testInvalidFromEmailFormat":0.001,"Src\\Tests\\MailTest::testInvalidToEmailFormat":0.001,"Src\\Tests\\MailTest::testInvalidSubject":0.001,"Src\\Tests\\MailTest::testEmptyBody":0.001,"Src\\Tests\\MailTest::testValidBodyWithParameters":0.001,"Src\\Tests\\MailTest::testValidBodyWithNoParameters":0.001,"DBConnectorTest::testClassExists":0.002,"Src\\Tests\\MailTest::testDBConnectorRealInstance":0.001}}
