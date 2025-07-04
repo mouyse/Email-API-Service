@@ -207,7 +207,12 @@ curl --location 'localhost/email-api-service/api/email' \
 
 ---
 
-## Run PHP Unit Tests
+## Run PHP Unit Tests and Generate Coverage
+
+```bash
+./vendor/bin/phpunit tests
 ```
-./vendor/bin/phpunit tests                        
-```
+
+### Example Output
+
+![PHPUnit Test Results](docs/php-unit-tests.png)
