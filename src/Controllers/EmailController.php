@@ -62,8 +62,8 @@ class EmailController
      */
     private function respond(int $status, array $data): void
     {
-        http_response_code($status);
-        header("Content-Type: application/json");
+        // http_response_code($status);
+        // header("Content-Type: application/json");
         echo json_encode($data);
     }
 }

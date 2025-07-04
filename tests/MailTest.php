@@ -195,4 +195,77 @@ class MailTest extends TestCase
             $this->mail_queue->addEmailToQueue($email)
         );
     }
+
+    /**
+     * Tests that an invalid status throws an exception.
+     * @return void
+     */
+    public function testInvalidStatus()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid status. Allowed values are 'pending', 'sent', 'failed'.");
+        $email = new Email(
+            'Test Subject',
+            'This is a test email body.',
+            'jayy.shah16@gmail.com',
+            'jayy.shah16@gmail.com',
+            [],
+            'not-a-valid-status'
+        );
+        $this->mail_queue->addEmailToQueue($email);
+    }
+
+    public function testConfigReturnsDatabaseConfig()
+    {
+        $config = \Src\Config\Config::getInstance();
+        $dbConfig = $config->getDatabaseConfig();
+        $this->assertIsArray($dbConfig);
+        $this->assertArrayHasKey('host', $dbConfig);
+        $this->assertArrayHasKey('name', $dbConfig);
+        $this->assertArrayHasKey('user', $dbConfig);
+        $this->assertArrayHasKey('password', $dbConfig);
+    }
+
+    public function testEmailControllerSendsSuccessResponse()
+    {
+        $mailQueueMock = $this->createMock(\Src\Queues\MailQueue::class);
+        $mailQueueMock->method('addEmailToQueue')->willReturn(true);
+
+        $controller = new \Src\Controllers\EmailController($mailQueueMock);
+
+        // Capture output
+        ob_start();
+        $controller->sendEmail([
+            'subject' => 'Test',
+            'body' => 'Body',
+            'to' => 'to@example.com',
+            'from' => 'from@example.com',
+            'parameters' => [],
+            'status' => 'pending'
+        ]);
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Email queued successfully', $output);
+    }
+
+    public function testEmailControllerSendsFailureResponse()
+    {
+        $mailQueueMock = $this->createMock(\Src\Queues\MailQueue::class);
+        $mailQueueMock->method('addEmailToQueue')->willReturn(false);
+
+        $controller = new \Src\Controllers\EmailController($mailQueueMock);
+
+        ob_start();
+        $controller->sendEmail([
+            'subject' => 'Test',
+            'body' => 'Body',
+            'to' => 'to@example.com',
+            'from' => 'from@example.com',
+            'parameters' => [],
+            'status' => 'pending'
+        ]);
+        $output = ob_get_clean();
+
+        $this->assertStringContainsString('Failed to queue email', $output);
+    }
 }
