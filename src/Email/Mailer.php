@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Src\Email;
 use Src\Database\DBConnector;
+use Src\Config\Config;
 
 /**
  * Class Mailer
@@ -24,6 +25,10 @@ class Mailer implements MailerInterface{
     public string $from;
     public string $status;
 
+    private int $maxTries;
+
+    private static array $providerFailures = [];
+
     /**
      * Mailer constructor.
      *
@@ -33,6 +38,7 @@ class Mailer implements MailerInterface{
     public function __construct(DBConnector $db, array $mailers){
         $this->db = $db;
         $this->mailers = $mailers;
+        $this->maxTries = (int) Config::getInstance()->get('FAILOVER_THRESHOLD', 3); // Use Config singleton
     }
 
     /**
@@ -63,16 +69,21 @@ class Mailer implements MailerInterface{
             'status' => $this->status
         ];
 
-        foreach($this->mailers as $mailer){
-
-            if($mailer->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status'])){
-                
-                // Return the last inserted ID
-                // return $this->db->getLastInsertId();
-                return true;
-
+        foreach($this->mailers as $providerKey => $mailer){
+            // Skip providers that have reached the failover threshold
+            if ((self::$providerFailures[$providerKey] ?? 0) >= $this->maxTries) {
+                continue;
             }
 
+            if($mailer->send($data['subject'], $data['body'], $data['to'], $data['from'], $data['status'])){
+                // Reset failure count on success
+                self::$providerFailures[$providerKey] = 0;
+                // return $this->db->getLastInsertId();
+                return true;
+            } else {
+                // Increment failure count
+                self::$providerFailures[$providerKey] = (self::$providerFailures[$providerKey] ?? 0) + 1;
+            }
         }
 
         return false;
