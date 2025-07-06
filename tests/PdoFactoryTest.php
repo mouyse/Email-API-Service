@@ -26,4 +26,15 @@ class PdoFactoryTest extends TestCase
             'password' => 'invalid'
         ]);
     }
+
+    /**
+     * Clean up after each test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        // Add cleanup code here if needed
+    }
 }

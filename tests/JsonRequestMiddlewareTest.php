@@ -34,4 +34,15 @@ class JsonRequestMiddlewareTest extends TestCase
         JsonRequestMiddleware::handle();
         $this->assertTrue(true);
     }
+
+    /**
+     * Clean up after each test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        // Add cleanup code here if needed
+    }
 }

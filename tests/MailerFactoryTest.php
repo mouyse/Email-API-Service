@@ -23,4 +23,15 @@ class MailerFactoryTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         MailerFactory::createMailer('unknown', []);
     }
+
+    /**
+     * Clean up after each test.
+     *
+     * @return void
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        // Add cleanup code here if needed
+    }
 }
