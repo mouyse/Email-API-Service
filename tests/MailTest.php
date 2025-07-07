@@ -8,6 +8,7 @@ use Src\Factories\MailerFactory;
 use Src\Repositories\MailQueueRepository;
 use Src\Models\Email;
 use Src\Database\DBConnector;
+use Src\Config\Config;
 
 /**
  * Class MailTest
@@ -38,17 +39,18 @@ class MailTest extends TestCase
         // Create the repository
         $repository = new MailQueueRepository($dbMock);
 
+        $config = Config::getInstance();
         $mailers = [];
-        if(isset($_ENV['ESP1']) && $_ENV['ESP1'] === 'SendGrid') {
+        if($config->get('ESP1') === 'SendGrid') {
             $mailers[] = MailerFactory::createMailer('sendgrid', [
-                'api_key' => $_ENV['ESP1_API_KEY'],
-                'domain' => $_ENV['ESP1_DOMAIN']
+                'api_key' => $config->get('ESP1_API_KEY'),
+                'domain' => $config->get('ESP1_DOMAIN')
             ]);
         }
-        if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') {
+        if($config->get('ESP2') === 'Mailgun') {
             $mailers[] = MailerFactory::createMailer('mailgun', [
-                'api_key' => $_ENV['ESP2_API_KEY'],
-                'domain' => $_ENV['ESP2_DOMAIN']
+                'api_key' => $config->get('ESP2_API_KEY'),
+                'domain' => $config->get('ESP2_DOMAIN')
             ]);
         }
 
