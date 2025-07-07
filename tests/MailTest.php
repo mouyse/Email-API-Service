@@ -18,7 +18,7 @@ class MailTest extends TestCase
     /**
      * @var MailQueue
      */
-    private $mail_queue;
+    private $mailQueue;
 
     /**
      * Sets up the test environment and initializes MailQueue with a mocked repository.
@@ -53,7 +53,7 @@ class MailTest extends TestCase
         }
 
         // Inject the repository into MailQueue
-        $this->mail_queue = new MailQueue($repository);
+        $this->mailQueue = new MailQueue($repository);
     }
 
     /**
@@ -70,7 +70,7 @@ class MailTest extends TestCase
             []
         );
         $this->assertTrue(
-            $this->mail_queue->addEmailToQueue($email)
+            $this->mailQueue->addEmailToQueue($email)
         );
     }
 
@@ -89,7 +89,7 @@ class MailTest extends TestCase
             'invalid-email-format',
             []
         );
-        $this->mail_queue->addEmailToQueue($email);
+        $this->mailQueue->addEmailToQueue($email);
     }
 
     /**
@@ -109,7 +109,7 @@ class MailTest extends TestCase
         );
         // Attempt to send an email with an invalid email format
         // This will throw an exception due to the invalid email format
-        $this->mail_queue->addEmailToQueue($email);
+        $this->mailQueue->addEmailToQueue($email);
     }
 
     /**
@@ -129,7 +129,7 @@ class MailTest extends TestCase
             'jayy.shah16@gmail.com',
             []
         );
-        $this->mail_queue->addEmailToQueue($email);
+        $this->mailQueue->addEmailToQueue($email);
     }
 
     /**
@@ -149,7 +149,7 @@ class MailTest extends TestCase
             'jayy.shah16@gmail.com',
             []
         );
-        $this->mail_queue->addEmailToQueue($email);
+        $this->mailQueue->addEmailToQueue($email);
     }
 
     /**
@@ -171,7 +171,7 @@ class MailTest extends TestCase
             ]
         );
         $this->assertTrue(
-            $this->mail_queue->addEmailToQueue($email)
+            $this->mailQueue->addEmailToQueue($email)
         );
     }
 
@@ -192,7 +192,7 @@ class MailTest extends TestCase
             ]
         );
         $this->assertTrue(
-            $this->mail_queue->addEmailToQueue($email)
+            $this->mailQueue->addEmailToQueue($email)
         );
     }
 
@@ -212,7 +212,7 @@ class MailTest extends TestCase
             [],
             'not-a-valid-status'
         );
-        $this->mail_queue->addEmailToQueue($email);
+        $this->mailQueue->addEmailToQueue($email);
     }
 
     public function testConfigReturnsDatabaseConfig()

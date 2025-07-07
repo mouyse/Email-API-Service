@@ -22,20 +22,20 @@ if(isset($_ENV['ESP2']) && $_ENV['ESP2'] === 'Mailgun') {
     ]);
 }
 
-$mail_queue = new MailQueue($mailers);
+$mailQueue = new MailQueue($mailers);
 $jobs = $queue->fetchPendingJobs($_ENV['BATCH_SIZE'] ?? 100);
 $mail = new Mailer($database, $mailers);
 foreach ($jobs as $job) {
     try {
         $response = $mail->send($job['subject'], $job['body'], $job['to'], $job['from'], $job['status']);
         if ($response) {
-            $mail_queue->updateEmailStatus($job['id'], 'sent');
+            $mailQueue->updateEmailStatus($job['id'], 'sent');
         } else {
-            $mail_queue->updateEmailStatus($job['id'], 'failed');
+            $mailQueue->updateEmailStatus($job['id'], 'failed');
         }
     } catch (Exception $e) {
         error_log("Failed to send email for job ID {$job['id']}: " . $e->getMessage());
-        $mail_queue->updateEmailStatus($job['id'], 'failed');
+        $mailQueue->updateEmailStatus($job['id'], 'failed');
     }
 }
 // If no jobs were fetched, log a message
